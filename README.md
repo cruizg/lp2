@@ -118,11 +118,11 @@ Crea el paquete `com.cibertec.matricula.model` y dentro, la clase `Estudiante.ja
 ```java
 package com.cibertec.matricula.model;
 //Estos son los imports que requiere  La entidad
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity // Marca esta clase como una tabla de base de datos
 public class Estudiante {
@@ -178,8 +178,8 @@ Crea el paquete `com.cibertec.matricula.util` y la clase `JPAUtil.java`.
 ```java
 package com.cibertec.matricula.util;
 //Imports requeridos 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 public class JPAUtil {
     private static final String PERSISTENCE_UNIT_NAME = "MatriculaPU";
@@ -214,13 +214,14 @@ package com.cibertec;
 
 import java.util.Scanner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import com.cibertec.matricula.util.JPAUtil;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 import org.h2.tools.Server;
 
 import com.cibertec.matricula.model.Estudiante;
-import com.cibertec.util.JPAUtil;
 
 /**
  * Hello world!
@@ -233,7 +234,7 @@ public class App {
             Server webServer = Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
             System.out.println(" H2 Web Console disponible en: http://localhost:8082");
             System.out.println("Conéctate con:");
-            System.out.println("JDBC URL: jdbc:h2:mem:matriculaDB");
+            System.out.println("JDBC URL: jdbc:h2:mem:matriculaLabDB");
             System.out.println("Usuario: sa");
             System.out.println("Contraseña: (dejar vacío)");
             return webServer;
@@ -353,7 +354,7 @@ Crea las siguientes clases en el paquete `com.cibertec.matricula.model`.
 ```java
 package com.cibertec.matricula.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -399,7 +400,7 @@ public class Curso {
 ```java
 package com.cibertec.matricula.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
