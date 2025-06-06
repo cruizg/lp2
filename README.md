@@ -20,10 +20,12 @@ Maven es una herramienta que nos ayuda a construir nuestro proyecto y a gestiona
 Abre una terminal y ejecuta el siguiente comando para crear la estructura del proyecto:
 
 ```bash
-mvn archetype:generate -DgroupId=com.cibertec -DartifactId=matricula -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.4 -DinteractiveMode=false
+ mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DgroupId=com.cibertec -DartifactId=matricula -DinteractiveMode=false
 ```
 
 Esto crea una carpeta llamada `matricula` con la estructura estándar de un proyecto Java.
+Entramos a la carpeta `matricula`  con el comando cd matricula.
+Una vez dentro lo abrimos con Visual Studio code con el comando `code .` 
 
 ### Paso 2.2: Añadir Dependencias en `pom.xml`
 
@@ -42,12 +44,6 @@ Abre el archivo `pom.xml` y reemplaza su contenido con el siguiente código:
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <!--
             Teoría: ¿Qué son estas dependencias?
@@ -56,16 +52,22 @@ Abre el archivo `pom.xml` y reemplaza su contenido con el siguiente código:
             2. h2: Es nuestra base de datos. Es súper ligera, escrita en Java y perfecta
                para laboratorios como este.
         -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.6.14.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.1.214</version>
-        </dependency>
+             <dependency>
+                 <groupId>jakarta.persistence</groupId>
+                 <artifactId>jakarta.persistence-api</artifactId>
+                 <version>3.1.0</version>
+             </dependency>
+             
+             <dependency>
+                 <groupId>org.hibernate</groupId>
+                 <artifactId>hibernate-core</artifactId>
+                 <version>6.6.17.Final</version>
+             </dependency>
+             <dependency>
+                 <groupId>com.h2database</groupId>
+                 <artifactId>h2</artifactId>
+                 <version>2.1.214</version>
+             </dependency>
     </dependencies>
     
     <!-- El resto de la configuración de build se puede mantener como está -->
@@ -83,37 +85,20 @@ Crea la carpeta `src/main/resources/META-INF` y, dentro de ella, el archivo `per
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence version="2.2"
-             xmlns="http://xmlns.jcp.org/xml/ns/persistence"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
-
-    <persistence-unit name="MatriculaPU" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        
-        <!-- Aquí registraremos nuestras clases que serán tablas -->
-        
-        <properties>
-            <!-- Configuración de la conexión a la base de datos H2 -->
-            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/db/matriculaLabDB"/>
-            <property name="javax.persistence.jdbc.user" value="sa"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
-
-            <!-- Propiedades de Hibernate -->
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
-            <!-- 
-                Teoría: hibernate.hbm2ddl.auto
-                'create-drop' es perfecto para desarrollo. Significa:
-                1. Al iniciar la aplicación, BORRA las tablas viejas (si existen).
-                2. CREA las tablas nuevas basadas en nuestras entidades.
-                3. Al cerrar la aplicación, BORRA todas las tablas.
-                Así, cada ejecución empieza con una base de datos limpia.
-            -->
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
-        </properties>
-    </persistence-unit>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="MatriculaPU" transaction-type="RESOURCE_LOCAL">
+    <!-- aca se colocaran las entidades que se van a mapear -->
+    <properties>
+      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:matriculaLabDB"/>
+      <property name="javax.persistence.jdbc.user" value="sa"/>
+      <property name="javax.persistence.jdbc.password" value=""/>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.show_sql" value="true"/>
+    </properties>
+  </persistence-unit>
 </persistence>
 ```
 
@@ -132,8 +117,12 @@ Crea el paquete `com.cibertec.matricula.model` y dentro, la clase `Estudiante.ja
 
 ```java
 package com.cibertec.matricula.model;
-
-import javax.persistence.*;
+//Estos son los imports que requiere  La entidad
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity // Marca esta clase como una tabla de base de datos
 public class Estudiante {
@@ -147,14 +136,17 @@ public class Estudiante {
 
     @Column(nullable = false, length = 50)
     private String apellido;
-
-    // Constructores, Getters y Setters (necesarios para que Hibernate funcione)
+    //Crea manualmente este constructor ( es obligatorio para usar JPA)
     public Estudiante() {}
+    // Constructores, Getters y Setters (necesarios para que Hibernate funcione)
+    // Los Constructores y Gett Sett se pueden crear tambien en Visual Studio Code haciendo click derecho al archivo> Source Action > Generate Getters and Setters
+   //  APlica lo mismo para los constructores click derecho al archivo> Source Action > Generate Constructor( y seleccionas todo (menos el Id, este se va autogenerar) 
 
     public Estudiante(String nombre, String apellido) {
         this.nombre = nombre;
         this.apellido = apellido;
     }
+    
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -162,14 +154,14 @@ public class Estudiante {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
-
+    //Sobreescribir el toString click derecho al archivo> Source Action > Generate toString
     @Override
     public String toString() {
         return "Estudiante{" + "id=" + id + ", nombre='" + nombre + "', apellido='" + apellido + "'}";
     }
 }
 ```
-
+Una vez creado tu modelo de Entidad:
 **Importante:** No olvides añadir la entidad a `persistence.xml`:
 
 ```xml
@@ -185,7 +177,7 @@ Crea el paquete `com.cibertec.matricula.util` y la clase `JPAUtil.java`.
 
 ```java
 package com.cibertec.matricula.util;
-
+//Imports requeridos 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -210,36 +202,40 @@ public class JPAUtil {
 
 ### Paso 3.3: La Clase Principal y el Servidor H2
 
-Vamos a modificar nuestra clase `App.java` para que haga todo:
+Vamos a modificar nuestra clase `App.java` para que haga todo,seguramente puedes ver el archivo App.java en el paquete com.cibertec:
 1.  Inicie el servidor de la base de datos H2.
 2.  Nos dé tiempo para ver la base de datos con una pausa.
 3.  Ejecute las operaciones CRUD.
 
-Reemplaza el contenido de `App.java` en el paquete `com.cibertec.matricula` con lo siguiente:
+Reemplaza el contenido de `App.java` en el paquete `com.cibertec` con lo siguiente:
 
 ```java
-package com.cibertec.matricula;
+package com.cibertec;
 
-import com.cibertec.matricula.model.Estudiante;
-import com.cibertec.matricula.util.JPAUtil;
-import org.h2.tools.Server;
+import java.util.Scanner;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.sql.SQLException;
-import java.util.Scanner;
 
+import org.h2.tools.Server;
+
+import com.cibertec.matricula.model.Estudiante;
+import com.cibertec.util.JPAUtil;
+
+/**
+ * Hello world!
+ */
 public class App {
-
     private static Server h2Server;
+
     private static Server iniciarServidorH2() {
         try {
             Server webServer = Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
             System.out.println(" H2 Web Console disponible en: http://localhost:8082");
             System.out.println("Conéctate con:");
-            System.out.println("   JDBC URL: jdbc:h2:mem:matriculaDB");
-            System.out.println("   Usuario: sa");
-            System.out.println("   Contraseña: (dejar vacío)");
+            System.out.println("JDBC URL: jdbc:h2:mem:matriculaDB");
+            System.out.println("Usuario: sa");
+            System.out.println("Contraseña: (dejar vacío)");
             return webServer;
         } catch (java.sql.SQLException e) {
             System.err.println("Error al iniciar el servidor H2");
@@ -252,6 +248,13 @@ public class App {
         System.out.print("Presiona ENTER para continuar...");
         scanner.nextLine();
     }
+
+    private static void stopH2Server() {
+        if (h2Server != null) {
+            h2Server.stop();
+        }
+    }
+
     public static void main(String[] args) {
         try {
             // 1. Iniciar el servidor H2 para poder acceder a la consola web
@@ -260,13 +263,13 @@ public class App {
 
             // Obtenemos un EntityManager
             EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
-            
+
             // --- CRUD ---
             // Teoría: Una Transacción es una operación "todo o nada". O se ejecutan
             // todas las operaciones dentro de ella, o no se ejecuta ninguna.
             // Es esencial para mantener la integridad de los datos.
             EntityTransaction tx = em.getTransaction();
-            
+
             // CREATE
             tx.begin();
             System.out.println("\n--- Creando un nuevo estudiante ---");
@@ -276,11 +279,12 @@ public class App {
             System.out.println("Estudiante creado con ID: " + nuevoEstudiante.getId());
 
             // PAUSA PARA VER LA BD
-            pausar();
+            pausar(scanner);
 
             // READ
             System.out.println("\n--- Leyendo el estudiante con ID " + nuevoEstudiante.getId() + " ---");
-            Estudiante estudianteLeido = em.find(Estudiante.class, nuevoEstudiante.getId()); // find() es como "SELECT ... WHERE ID="
+            Estudiante estudianteLeido = em.find(Estudiante.class, nuevoEstudiante.getId()); // find() es como "SELECT
+                                                                                             // ... WHERE ID="
             System.out.println("Estudiante encontrado: " + estudianteLeido);
 
             // UPDATE
@@ -292,7 +296,7 @@ public class App {
             System.out.println("Estudiante actualizado: " + estudianteLeido);
 
             // PAUSA PARA VER LA BD
-            pausar();
+            pausar(scanner);
 
             // DELETE
             tx.begin();
@@ -306,7 +310,7 @@ public class App {
             // Verificamos que ya no existe
             Estudiante estudianteBorrado = em.find(Estudiante.class, estudianteLeido.getId());
             System.out.println("¿Estudiante existe? " + (estudianteBorrado == null ? "No" : "Sí"));
-            
+
             em.close();
 
         } catch (Exception e) {
@@ -318,21 +322,8 @@ public class App {
             System.out.println("\n>>> APLICACIÓN FINALIZADA <<<");
         }
     }
-
-    private static void startH2Server() throws SQLException {
-        // Inicia el servidor TCP (para la aplicación) y el servidor Web (para la consola)
-        h2Server = Server.createTcpServer("-tcpAllowOthers").start();
-        Server.createWebServer("-webAllowOthers").start();
-    }
-
-    private static void stopH2Server() {
-        if (h2Server != null) {
-            h2Server.stop();
-        }
-    }
-    
-    
 }
+
 ```
 
 ### ¡A Ejecutar!
