@@ -482,6 +482,9 @@ Reemplaza el código dentro del bloque `try` del `main` en `App.java` para proba
 ```java
 // Reemplaza el contenido del bloque try en App.java
 try {
+
+    Server webServer = iniciarServidorH2();
+    Scanner scanner = new Scanner(System.in);
     System.out.println(">>> SERVIDOR H2 INICIADO. Revisa la consola en http://localhost:8082 <<<");
     
     EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
