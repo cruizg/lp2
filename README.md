@@ -510,7 +510,7 @@ try {
     System.out.println("Estudiante Ana matriculada en Cálculo y Física.");
 
     // PAUSA PARA VER LA BD
-    pausar();
+    pausar(scanner);
     
     // 3. Consulta con JPQL (Java Persistence Query Language)
     // Teoría: JPQL es como SQL, pero en lugar de operar sobre tablas, opera sobre
