@@ -450,6 +450,7 @@ Añade la relación `OneToMany` a la clase `Estudiante.java`.
 
 ```java
 // Dentro de la clase Estudiante.java
+import jakarta.persistence.CascadeType;
 
 // ... otros campos y métodos ...
 
