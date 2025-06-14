@@ -59,6 +59,7 @@ Usaremos la herramienta oficial de Spring para crear la estructura de nuestro pr
     *   **Spring Data JPA**: Para la persistencia de datos y la comunicación con la base de datos.
     *   **Thymeleaf**: Nuestro motor para crear las plantillas HTML dinámicas.
     *   **PostgreSQL Driver**: El "traductor" específico que necesita Java para comunicarse con nuestra base de datos PostgreSQL en Supabase.
+    *   **Lombok**: Para evitar escribir manualmente getters, setters, constructores, etc.
 4.  Haz clic en el botón **GENERATE**. Se descargará un archivo `.zip`.
 5.  Descomprime el archivo y abre la carpeta del proyecto con tu IDE (Visual Studio Code, IntelliJ, etc.).
 
